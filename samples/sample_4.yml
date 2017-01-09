@@ -1,0 +1,127 @@
+---
+# Initial Step:
+#
+# Schedule a new job giving a specific topic and specifying the remote CI.
+# The return of this action contains all the data associated with the job,
+# we hence register those data for later consumptions
+#
+- hosts: localhost
+  tasks:
+    - name: Schedule a new job
+      dci_new_job:
+        topic: 'OSP8'
+        remoteci: 'dci-env-ovb-1'
+      register: job_informations
+
+
+# New state
+#
+# User is free to do whaterver she needs before entering pre-run state.
+# Usually this is used to sync the components the job is relying on.
+#
+- hosts: localhost
+  vars:
+    dci_status: 'new'
+    dci_comment: 'Creating OSP 8 local mirrors and synchronizing them'
+    components: "{{ job_informations['components'] }}"
+    job_id: "{{ job_informations['job_id'] }}"
+  tasks:
+    - block:
+      - name: Ensure proper directories are created
+        file:
+          path: '{{ dci_mirror_location }}/{{ job_id }}'
+          state: directory
+        with_items: "{{ components }}"
+
+      - name: Retrieve component
+        dci_component:
+          dest: '{{ dci_mirror_location }}/{{ item["id"] }}.tar'
+          component_id: '{{ item["id"] }}'
+        with_items: "{{ components }}"
+
+      - name: Unarchive component
+        unarchive:
+          src: '{{ dci_mirror_location }}/{{ item["id"] }}.tar'
+          dest: '{{ dci_mirror_location }}/{{ job_id }}'
+          remote_src: True
+        with_items: "{{ components }}"
+
+      rescue:
+      - name: Fail properly
+        fail:
+          msg: 'Something went wrong with the installation'
+        when: 'failure is defined'
+
+
+# Pre-run state
+#
+# User is free to do whaterver she needs before entering pre-run state.
+# Usually this is used to boot (not provision) the undercloud
+#
+- hosts: localhost
+  vars:
+    dci_status: 'pre-run'
+    dci_comment: 'Spawning the undercloud'
+  tasks:
+    - block:
+      - include: pre-run.yml
+
+      rescue:
+      - name: Fail properly
+        fail:
+          msg: 'Something went wrong with the installation'
+        when: 'failure is defined'
+
+
+# Run state
+#
+# User is free to do whaterver she needs before entering pre-run state.
+# Usually this is used to provision both undercloud and the overcloud.
+#
+- hosts: UNDERCLOUD.IP
+  user: centos
+  become: true
+  vars:
+    dci_status: 'running'
+    dci_comment: 'Provision the undercloud and the overcloud'
+  tasks:
+    - block:
+      - include: running.yml
+
+      rescue:
+      - name: Tear me down
+        shell: echo 'Tear me down'
+
+      - name: Fail properly
+        fail:
+          msg: 'Something went wrong with the installation'
+        when: 'failure is defined'
+
+
+# Post-run state
+#
+# User is free to do whaterver she needs before entering pre-run state.
+# Usually this is used to run tests, certifications, etc...
+#
+- hosts: UNDERCLOUD.IP
+  user: centos
+  become: true
+  vars:
+    dci_status: 'post-run'
+    dci_comment: 'Running tests'
+    tests: "{{ job_informations['tests'] }}"
+  roles:
+    - { role: ansible-role-certification, when: 'certification' in tests }
+    - { role: ansible-role-tempest, when: 'tempest' in tests }
+
+
+# Success state
+# 
+# User is free to do whaterver she needs before entering pre-run state.
+# Usually this is used to teardown the plateform
+#
+- hosts: localhost
+  vars:
+    dci_status: 'success'
+  tasks:
+    - include: teardown.yml

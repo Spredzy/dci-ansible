@@ -100,20 +100,43 @@
 # User is free to do whaterver she needs before entering post-run state.
 # Usually this is used to run tests, certifications, etc...
 #
-- hosts: UNDERCLOUD.IP
-  user: centos
-  become: true
+- hosts: localhost
   vars:
     dci_status: 'post-run'
     dci_comment: 'Running tests'
-    tests: "{{ job_informations['tests'] }}"
-  roles:
-    - { role: ansible-role-certification, when: 'certification' in tests }
-    - { role: ansible-role-tempest, when: 'tempest' in tests }
+    job_id: "{{ job_informations['job_id'] }}"
+  tasks:
+    - block:
+       - name: Run tests
+         dci_run_tests:
+           undercloud_ip: '46.231.133.242'
+           remoteci: 'dci-env-ovb-1'
+           key_filename: '/root/.ssh/id_rsa'
+           job_id: '{{ job_id }}'
 
+      rescue:
+      - name: Tear me down
+        shell: echo 'Tear me down'
+
+      - name: Fail properly
+        fail:
+          msg: 'Something went wrong with the installation'
+
+# Ideally the above could be replaced with a more generic play like the following
+#
+#- hosts: UNDERCLOUD.IP
+#  become: true
+#  user: centos
+#  vars:
+#    dci_status: 'post-run'
+#    dci_comment: 'Running tests'
+#    tests: "{{ job_informations['tests'] }}"
+#  roles:
+#    - { role: ansible-role-certification, when: 'certification' in tests }
+#    - { role: ansible-role-tempest, when: 'tempest' in tests }
 
 # Success state
-# 
+#
 # User is free to do whaterver she needs before entering pre-run state.
 # Usually this is used to teardown the plateform
 #

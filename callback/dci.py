@@ -102,14 +102,14 @@ class CallbackModule(CallbackBase):
                 self._mime_type == 'application/junit'):
             dci_file.create(
                 self._dci_context,
-                name=result._task.get_name(),
+                name=result._task.get_name().encode('UTF-8'),
                 content=output.encode('UTF-8'),
                 mime=self._mime_type,
                 job_id=self._job_id)
         elif result._task.get_name() != 'setup' and output != '\n':
             dci_file.create(
                 self._dci_context,
-                name=result._task.get_name(),
+                name=result._task.get_name().encode('UTF-8'),
                 content=output.encode('UTF-8'),
                 mime=self._mime_type,
                 jobstate_id=self._jobstate_id)
@@ -131,7 +131,7 @@ class CallbackModule(CallbackBase):
         self._jobstate_id = new_state['jobstate']['id']
         dci_file.create(
             self._dci_context,
-            name=result._task.get_name(),
+            name=result._task.get_name().encode('UTF-8'),
             content=output.encode('UTF-8'),
             mime=self._mime_type,
             jobstate_id=self._jobstate_id)
@@ -147,7 +147,7 @@ class CallbackModule(CallbackBase):
         if play.get_vars():
             status = play.get_vars()['dci_status']
             if 'dci_comment' in play.get_vars():
-                comment = play.get_vars()['dci_comment']
+                comment = play.get_vars()['dci_comment'].encode('UTF-8')
             if 'dci_mime_type' in play.get_vars():
                 self._mime_type = play.get_vars()['dci_mime_type']
             else:

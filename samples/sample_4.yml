@@ -50,7 +50,6 @@
       - name: Fail properly
         fail:
           msg: 'Something went wrong with the installation'
-        when: 'failure is defined'
 
 
 # Pre-run state
@@ -70,12 +69,11 @@
       - name: Fail properly
         fail:
           msg: 'Something went wrong with the installation'
-        when: 'failure is defined'
 
 
 # Run state
 #
-# User is free to do whaterver she needs before entering pre-run state.
+# User is free to do whaterver she needs before entering running state.
 # Usually this is used to provision both undercloud and the overcloud.
 #
 - hosts: UNDERCLOUD.IP
@@ -95,12 +93,11 @@
       - name: Fail properly
         fail:
           msg: 'Something went wrong with the installation'
-        when: 'failure is defined'
 
 
 # Post-run state
 #
-# User is free to do whaterver she needs before entering pre-run state.
+# User is free to do whaterver she needs before entering post-run state.
 # Usually this is used to run tests, certifications, etc...
 #
 - hosts: UNDERCLOUD.IP

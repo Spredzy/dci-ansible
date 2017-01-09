@@ -50,7 +50,6 @@
       - name: Fail properly
         fail:
           msg: 'Something went wrong with the installation'
-        when: 'failure is defined'
 
 
 # Pre-run state
@@ -64,6 +63,11 @@
     dci_comment: 'Spawning the Undercloud VM'
   tasks:
     - block:
+      - name: Ensure the undercloud VM is absent
+        os_server:
+          state: absent
+          name: rdo-undercloud
+
       - name: Spawn the undercloud VM
         os_server:
           name: rdo-undercloud
@@ -81,7 +85,6 @@
       - name: Fail properly
         fail:
           msg: 'Something went wrong with the installation'
-        when: 'failure is defined'
 
 
 # Pre-run state
@@ -150,7 +153,6 @@
       - name: Fail properly
         fail:
           msg: 'Something went wrong with the installation'
-        when: 'failure is defined'
 
 
 # Success state

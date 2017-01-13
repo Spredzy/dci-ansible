@@ -51,7 +51,7 @@ options:
   path:
     required: true
     description: Path of the document to upload
- name:
+  name:
     required: false
     description: Name under which the file will be saved on the control-server
 '''

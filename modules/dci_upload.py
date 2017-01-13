@@ -51,16 +51,20 @@ options:
   path:
     required: true
     description: Path of the document to upload
+ name:
+    required: false
+    description: Name under which the file will be saved on the control-server
 '''
 
 EXAMPLES = '''
 - name: Attach files to job
   dci_upload:
-    path: '{{ item }}'
+    path: '{{ item.path }}'
+    name: '{{ item.name }}'
     job_id: '{{ job_id }}'
   with_items:
-    - '/etc/ssh/sshd_config'
-    - '/etc/myown.conf'
+    - {'name': 'SSHd config', 'path': '/etc/ssh/sshd_config'}
+    - {'name': 'My OpenStack config', 'path': '/etc/myown.conf'}
 
 - name: Attach junit result
   dci_upload:
@@ -98,6 +102,7 @@ def main():
             login=dict(required=False, type='str'),
             password=dict(required=False, type='str'),
             path=dict(type='str'),
+            name=dict(required=False, type='str'),
             mime=dict(default='text/plain', type='str'),
             job_id=dict(type='str'),
             url=dict(required=False, type='str'),
@@ -113,7 +118,11 @@ def main():
 
     ctx = dci_context.build_dci_context(url, login, password, 'ansible')
 
-    dci_file.create(ctx, name=module.params['path'],
+    name = module.params['path']
+    if module.params['name']:
+        name = module.params['name']
+
+    dci_file.create(ctx, name=name,
                     content=open(module.params['path'], 'r').read(),
                     mime=module.params['mime'], job_id=module.params['job_id'])
 

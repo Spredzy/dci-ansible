@@ -97,11 +97,12 @@ Its usage looks like:
   tasks:
     - name: attach files to job
       dci_upload:
-        path: '{{ item }}'
+        path: '{{ item.path }}'
+        name: '{{ item.name }}'
         job_id: '{{ job_id }}'
       with_items:
-        - '/etc/ssh/sshd_config'
-        - '/etc/openstack/my.conf'
+        - {'name': 'SSHd Config', 'path': '/etc/ssh/sshd_config'}
+        - {'name': 'My OpenStack Conf', 'path': '/etc/openstack/my.conf'}
 ```
 
 This sample will attach the two files listed to this specific job.

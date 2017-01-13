@@ -43,7 +43,7 @@ options:
     required: false
     description: DCI Control Server URL
   topic:
-    required: true
+    required: false
     description: Topic's to get a job to
   remoteci:
     required: true
@@ -90,7 +90,7 @@ def main():
             state=dict(default='present', choices=['present', 'absent'], type='str'),
             login=dict(required=False, type='str'),
             password=dict(required=False, type='str'),
-            topic=dict(type='str'),
+            topic=dict(required=False, type='str'),
             remoteci=dict(type='str'),
             url=dict(required=False, type='str'),
         ),
@@ -99,13 +99,16 @@ def main():
     if not requests_found:
         module.fail_json(msg='The python requests module is required')
 
+    topic_list = [module.params['topic'], os.getenv('DCI_TOPIC')]
+    topic = next((item for item in topic_list if item is not None), None)
+
     login, password, url = get_details(module)
     if not login or not password:
         module.fail_json(msg='login and/or password have not been specified')
 
     ctx = dci_context.build_dci_context(url, login, password, 'ansible')
 
-    topic_id = dci_topic.get(ctx, module.params['topic']).json()['topic']['id']
+    topic_id = dci_topic.get(ctx, topic).json()['topic']['id']
     remoteci = dci_remoteci.get(ctx, module.params['remoteci']).json()
     remoteci_id = remoteci['remoteci']['id']
 

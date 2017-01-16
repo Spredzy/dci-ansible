@@ -8,7 +8,7 @@
 - hosts: localhost
   tasks:
     - name: Schedule a new job
-      dci_new_job:
+      dci_job:
         topic: 'OSP8'
         remoteci: 'dci-env-ovb-1'
       register: job_informations

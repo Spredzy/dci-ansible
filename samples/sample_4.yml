@@ -114,6 +114,16 @@
            key_filename: '/root/.ssh/id_rsa'
            job_id: '{{ job_id }}'
 
+       - name: Upload junit results
+         dci_file:
+           path: '{{ item.path }}'
+           name: '{{ item.name }}'
+           mime: 'application/junit'
+           job_id: '{{ job_id }}'
+         with_items:
+           - {'name': 'Rally', 'path': 'rally.xml' }
+           - {'name': 'Tempest', 'path': 'tempest.xml' }
+
       rescue:
       - name: Tear me down
         shell: echo 'Tear me down'

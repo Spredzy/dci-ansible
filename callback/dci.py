@@ -141,13 +141,32 @@ class CallbackModule(CallbackBase):
         the current jobstate id.
         """
 
+        def _get_comment(play):
+            """ Return the comment for the new jobstate
+
+                The order of priority is as follow:
+
+                  * play/vars/dci_comment
+                  * play/name
+                  * '' (Empty String)
+            """
+
+            if play.get_vars() and 'dci_comment' in play.get_vars():
+                comment = play.get_vars()['dci_comment'].encode('UTF-8')
+            # If no name has been specified to the play, play.name is equal
+            # to the hosts value
+            elif play.name and play.name not in play.hosts:
+                comment = play.name
+            else:
+                comment = ''
+
+            return comment
+
         super(CallbackModule, self).v2_playbook_on_play_start(play)
         status = None
-        comment = ''
+        comment = _get_comment(play)
         if play.get_vars():
             status = play.get_vars()['dci_status']
-            if 'dci_comment' in play.get_vars():
-                comment = play.get_vars()['dci_comment'].encode('UTF-8')
             if 'dci_mime_type' in play.get_vars():
                 self._mime_type = play.get_vars()['dci_mime_type']
             else:

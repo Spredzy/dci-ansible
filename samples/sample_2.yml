@@ -19,10 +19,10 @@
 # User is free to do whaterver she needs before entering pre-run state.
 # Usually this is used to sync the components the job is relying on.
 #
-- hosts: localhost
+- name: 'New state commands'
+  hosts: localhost
   vars:
     dci_status: 'new'
-    dci_comment: 'New state commands'
   tasks:
     - block:
       - name: echo 'New'
@@ -39,11 +39,11 @@
 # User is free to do whaterver she needs before entering pre-run state.
 # Usually this is used to spawn the undercloud vm
 #
-- hosts: localhost
+- name: 'Pre-run state commands'
+  hosts: localhost
   any_errors_fatal: true
   vars:
     dci_status: 'pre-run'
-    dci_comment: 'Pre-run state commands'
   tasks:
     - block:
       - name: echo 'Pre-run'
@@ -59,11 +59,11 @@
 # User is free to do whaterver she needs before entering running state.
 # Usually this is used to provision the undercloud and the overcloud
 #
-- hosts: localhost
+- name: 'Running state commands'
+  hosts: localhost
   any_errors_fatal: true
   vars:
     dci_status: 'running'
-    dci_comment: 'Running state commands'
   tasks:
     - block:
       - name: echo 'Running'
@@ -83,11 +83,11 @@
 # User is free to do whaterver she needs before entering post-run state.
 # Usually this is used to run tests on the overcloud
 #
-- hosts: localhost
+- name: 'Post-run state commands'
+  hosts: localhost
   any_errors_fatal: true
   vars:
     dci_status: 'post-run'
-    dci_comment: 'Post-run state commands'
   tasks:
     - block:
       - name: echo 'Post-run'
@@ -107,7 +107,8 @@
 # User is free to do whaterver she needs before entering pre-run state.
 # Usually this is used to teardown the plateform
 #
-- hosts: localhost
+- name: 'Success state commands'
+  hosts: localhost
   any_errors_fatal: true
   vars:
     dci_status: 'success'

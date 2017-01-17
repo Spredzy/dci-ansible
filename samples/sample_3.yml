@@ -19,10 +19,10 @@
 # User is free to do whaterver she needs before entering pre-run state.
 # Usually this is used to sync the components the job is relying on.
 #
-- hosts: localhost
+- name: 'Creating OSP 8 local mirrors and synchronizing them'
+  hosts: localhost
   vars:
     dci_status: 'new'
-    dci_comment: 'Creating OSP 8 local mirrors and synchronizing them'
     components: "{{ job_informations['components'] }}"
     job_id: "{{ job_informations['job_id'] }}"
   tasks:
@@ -35,8 +35,8 @@
 
       - name: Retrieve component
         dci_component:
+          id: '{{ item["id"] }}'
           dest: '{{ dci_mirror_location }}/{{ item["id"] }}.tar'
-          component_id: '{{ item["id"] }}'
         with_items: "{{ components }}"
 
       - name: Unarchive component
@@ -57,10 +57,10 @@
 # User is free to do whaterver she needs before entering pre-run state.
 # Usually this is used to spawn the undercloud vm
 #
-- hosts: localhost
+- name: 'Spawning the Undercloud VM'
+  hosts: localhost
   vars:
     dci_status: 'pre-run'
-    dci_comment: 'Spawning the Undercloud VM'
   tasks:
     - block:
       - name: Ensure the undercloud VM is absent

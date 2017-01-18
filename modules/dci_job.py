@@ -13,7 +13,6 @@
 
 from ansible.module_utils.basic import *
 
-import json
 import os
 
 try:
@@ -119,7 +118,7 @@ def main():
             remoteci=dict(type='str'),
             comment=dict(type='str'),
             status=dict(type='str'),
-            configuration=dict(type='str'),
+            configuration=dict(type='dict'),
         ),
     )
 
@@ -174,7 +173,7 @@ def main():
             if module.params['status']:
                 kwargs['status'] = module.params['status']
             if module.params['configuration']:
-                kwargs['configuration'] = json.loads(module.params['configuration'])
+                kwargs['configuration'] = module.params['configuration']
             res = dci_job.update(ctx, **kwargs)
 
     # Action required: Schedule a new job

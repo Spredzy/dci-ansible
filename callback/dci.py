@@ -156,7 +156,7 @@ class CallbackModule(CallbackBase):
             # If no name has been specified to the play, play.name is equal
             # to the hosts value
             elif play.name and play.name not in play.hosts:
-                comment = play.name
+                comment = play.name.encode('UTF-8')
             else:
                 comment = ''
 
